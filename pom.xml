@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.Thung0808</groupId>
+    <groupId>io.github.thung0808</groupId>
     <artifactId>xai-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>XAI Core</name>
-    <description>Enterprise-grade JVM-native Explainable AI library with production-ready performance and regulatory compliance features</description>
+    <description>Enterprise-grade JVM-native Explainable AI library with production-ready performance, regulatory compliance, Causal AI, LLM explainability, privacy-preserving inference, and interactive what-if simulation</description>
     <url>https://github.com/Thung0808/xai-core</url>
 
     <licenses>
@@ -62,6 +62,30 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- ONNX Runtime for LLM/Transformer support -->
+        <dependency>
+            <groupId>com.microsoft.onnxruntime</groupId>
+            <artifactId>onnxruntime</artifactId>
+            <version>1.17.1</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- JSON processing for DAG serialization -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Boot WebSocket (optional for interactive features) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+            <version>3.2.0</version>
+            <optional>true</optional>
+        </dependency>
+
         <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -78,6 +102,38 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <!-- Minimal profile: core XAI without heavy ML dependencies -->
+        <profile>
+            <id>minimal</id>
+            <activation>
+                <property>
+                    <name>minimal</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.microsoft.onnxruntime</groupId>
+                    <artifactId>onnxruntime</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-websocket</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- Full profile: all features including LLM, Causal, Privacy, What-If (default) -->
+        <profile>
+            <id>full</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
