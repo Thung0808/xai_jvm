@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAI Dashboard 2.0 - Explainable AI Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: #f5f5f5;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-button:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Causal Graph Tab */
+        #causalGraph {
+            height: 600px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+            margin-bottom: 20px;
+        }
+        
+        .graph-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .graph-controls input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        
+        .graph-controls button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        .graph-controls button:hover {
+            background: #764ba2;
+        }
+        
+        /* Token Highlighter */
+        .text-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .tokens {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .token {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .token:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .token.low-saliency {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .token.medium-saliency {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.6);
+            color: #444;
+        }
+        
+        .token.high-saliency {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            font-weight: 700;
+        }
+        
+        .saliency-bar {
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(to right, 
+                rgba(102, 126, 234, 0.1) 0%, 
+                rgba(102, 126, 234, 0.5) 50%, 
+                rgba(102, 126, 234, 1) 100%);
+            border-radius: 6px;
+            margin: 15px 0;
+            position: relative;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .saliency-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        /* What-If Playground */
+        .playground {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .playground-section {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .playground-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        
+        .feature-slider {
+            margin-bottom: 20px;
+        }
+        
+        .feature-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .feature-slider input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .feature-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+        
+        .feature-slider input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+        
+        .prediction-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            margin-top: 20px;
+        }
+        
+        .prediction-value {
+            font-size: 2.5em;
+            color: #667eea;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .sensitivity-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .sensitivity-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        /* Privacy Audit */
+        .privacy-section {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ff9800;
+            margin-bottom: 20px;
+        }
+        
+        .privacy-section h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+        
+        .budget-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            border: 2px solid #ff9800;
+        }
+        
+        .budget-filled {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #ff9800, #ff5252);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .warning {
+            background: #ffebee;
+            border-left: 4px solid #ff5252;
+            padding: 15px;
+            border-radius: 6px;
+            color: #c62828;
+            margin-top: 15px;
+        }
+        
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            border-radius: 6px;
+            color: #2e7d32;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 1024px) {
+            .playground {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 XAI Dashboard 2.0</h1>
+            <p>Enterprise-grade explainability visualization with Causal AI, LLM transparency, privacy audits, and interactive what-if simulations</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="causal">Causal Graph</button>
+            <button class="tab-button" data-tab="llm">LLM Explainability</button>
+            <button class="tab-button" data-tab="whatif">What-If Playground</button>
+            <button class="tab-button" data-tab="privacy">Privacy Audit</button>
+        </div>
+        
+        <!-- Causal Graph Tab -->
+        <div id="causal" class="tab-content active">
+            <h2>🔗 Causal Graph Analysis</h2>
+            <div class="graph-controls">
+                <input type="text" id="nodeInput" placeholder="Add node (e.g., 'age')">
+                <input type="text" id="edgeInput" placeholder="Add edge (e.g., 'age->income:0.3')">
+                <button onclick="addNode()">Add Node</button>
+                <button onclick="addEdge()">Add Edge</button>
+                <button onclick="resetGraph()">Reset</button>
+            </div>
+            
+            <div id="causalGraph"></div>
+            
+            <div style="margin-top: 20px;">
+                <h3>Graph Metrics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Nodes</div>
+                        <div class="stat-value" id="nodeCount">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Edges</div>
+                        <div class="stat-value" id="edgeCount">6</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Confounders</div>
+                        <div class="stat-value" id="confounderCount">2</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Paths</div>
+                        <div class="stat-value" id="pathCount">3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LLM Explainability Tab -->
+        <div id="llm" class="tab-content">
+            <h2>🧠 LLM Token Saliency Map</h2>
+            
+            <div class="text-container">
+                <h3>Input Text</h3>
+                <p>The model predicts high income based on education level.</p>
+            </div>
+            
+            <div class="text-container">
+                <h3>Token Importance (Saliency)</h3>
+                <div class="saliency-bar"></div>
+                <div class="saliency-labels">
+                    <span>Low Importance</span>
+                    <span>Medium</span>
+                    <span>High Importance</span>
+                </div>
+            </div>
+            
+            <div class="text-container">
+                <h3>Highlighted Tokens</h3>
+                <div class="tokens">
+                    <span class="token low-saliency" title="Saliency: 0.15">The</span>
+                    <span class="token low-saliency" title="Saliency: 0.25">model</span>
+                    <span class="token medium-saliency" title="Saliency: 0.45">predicts</span>
+                    <span class="token high-saliency" title="Saliency: 0.85">high</span>
+                    <span class="token high-saliency" title="Saliency: 0.95">income</span>
+                    <span class="token medium-saliency" title="Saliency: 0.55">based</span>
+                    <span class="token low-saliency" title="Saliency: 0.20">on</span>
+                    <span class="token high-saliency" title="Saliency: 0.80">education</span>
+                    <span class="token low-saliency" title="Saliency: 0.10">level</span>
+                </div>
+            </div>
+            
+            <div class="text-container">
+                <h3>Attention Head Analysis</h3>
+                <p><strong>Layer 2, Head 3:</strong> Focuses on economic keywords</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Attention on "income" ← "high" (0.92)</li>
+                    <li>Attention on "education" ← "income" (0.78)</li>
+                    <li>Attention on "predicts" ← "education" (0.65)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- What-If Playground Tab -->
+        <div id="whatif" class="tab-content">
+            <h2>🎯 Interactive What-If Playground</h2>
+            
+            <div class="playground">
+                <div class="playground-section">
+                    <h3>Feature Controls</h3>
+                    
+                    <div class="feature-slider">
+                        <div class="feature-label">
+                            <span>Age</span>
+                            <span id="ageValue">30</span>
+                        </div>
+                        <input type="range" id="ageSlider" min="18" max="70" value="30" oninput="updatePrediction()">
+                    </div>
+                    
+                    <div class="feature-slider">
+                        <div class="feature-label">
+                            <span>Education (years)</span>
+                            <span id="eduValue">12</span>
+                        </div>
+                        <input type="range" id="eduSlider" min="6" max="20" value="12" oninput="updatePrediction()">
+                    </div>
+                    
+                    <div class="feature-slider">
+                        <div class="feature-label">
+                            <span>Experience (years)</span>
+                            <span id="expValue">5</span>
+                        </div>
+                        <input type="range" id="expSlider" min="0" max="40" value="5" oninput="updatePrediction()">
+                    </div>
+                    
+                    <button onclick="resetPlayground()" style="width: 100%; margin-top: 20px; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Reset to Baseline</button>
+                </div>
+                
+                <div class="playground-section">
+                    <h3>Live Prediction</h3>
+                    
+                    <div class="prediction-box">
+                        <div style="color: #666; margin-bottom: 10px;">Predicted Income</div>
+                        <div class="prediction-value" id="predictionValue">$14,500</div>
+                        <div style="text-align: center; color: #999; font-size: 0.9em;">
+                            Change from baseline: <span id="predictionChange">+0%</span>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 30px;">Feature Sensitivity</h3>
+                    <div class="sensitivity-item">
+                        <span>Age</span>
+                        <span class="sensitivity-value">+$300/year</span>
+                    </div>
+                    <div class="sensitivity-item">
+                        <span>Education</span>
+                        <span class="sensitivity-value">+$500/year</span>
+                    </div>
+                    <div class="sensitivity-item">
+                        <span>Experience</span>
+                        <span class="sensitivity-value">+$200/year</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Privacy Audit Tab -->
+        <div id="privacy" class="tab-content">
+            <h2>🔐 Privacy Budget & Audit Report</h2>
+            
+            <div class="privacy-section">
+                <h3>Epsilon Budget Status</h3>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Total Budget: ε = 1.0</span>
+                    <span>Consumed: ε = 0.35 (35%)</span>
+                </div>
+                <div class="budget-bar">
+                    <div class="budget-filled" style="width: 35%;">35%</div>
+                </div>
+                <div class="success">
+                    ✓ Budget available. Explanations can continue safely.
+                </div>
+            </div>
+            
+            <div class="privacy-section">
+                <h3>Differential Privacy Mechanism</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Mechanism</div>
+                        <div class="stat-value">Laplace</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Sensitivity</div>
+                        <div class="stat-value">0.001</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Epsilon (ε)</div>
+                        <div class="stat-value">0.35</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Delta (δ)</div>
+                        <div class="stat-value">1e-6</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="privacy-section">
+                <h3>Federated Privacy Status</h3>
+                <div style="margin-bottom: 15px;">
+                    <p><strong>Client 1 (Edge Device):</strong> ε = 0.15 consumed</p>
+                    <div class="budget-bar" style="margin-top: 8px;">
+                        <div class="budget-filled" style="width: 15%; background: linear-gradient(90deg, #4caf50, #8bc34a);">15%</div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <p><strong>Client 2 (Mobile App):</strong> ε = 0.12 consumed</p>
+                    <div class="budget-bar" style="margin-top: 8px;">
+                        <div class="budget-filled" style="width: 12%; background: linear-gradient(90deg, #4caf50, #8bc34a);">12%</div>
+                    </div>
+                </div>
+                <div>
+                    <p><strong>Client 3 (Web Server):</strong> ε = 0.08 consumed</p>
+                    <div class="budget-bar" style="margin-top: 8px;">
+                        <div class="budget-filled" style="width: 8%; background: linear-gradient(90deg, #4caf50, #8bc34a);">8%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="privacy-section">
+                <h3>Reconstruction Attack Risk Assessment</h3>
+                <div class="success">
+                    Risk Score: 25% (LOW)<br>
+                    <strong>✓ Safe:</strong> Low risk of membership inference or data reconstruction attacks.
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 6px; border-left: 3px solid #2196F3;">
+                    <strong>Recommendations:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Continue monitoring budget consumption</li>
+                        <li>Reset daily privacy budgets to refresh quota</li>
+                        <li>Implement per-user query rate limiting</li>
+                        <li>Enable audit logging for compliance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize Cytoscape graph
+        let cy = cytoscape({
+            container: document.getElementById('causalGraph'),
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': '#667eea',
+                        'label': 'data(id)',
+                        'text-valign': 'center',
+                        'text-halign': 'center',
+                        'color': 'white',
+                        'font-weight': 'bold',
+                        'width': '60px',
+                        'height': '60px',
+                        'border-width': 2,
+                        'border-color': '#764ba2'
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'line-color': '#999',
+                        'target-arrow-color': '#999',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier',
+                        'label': 'data(weight)',
+                        'text-background-color': 'white',
+                        'text-background-padding': '3px',
+                        'text-background-opacity': 0.8,
+                        'width': 2
+                    }
+                }
+            ],
+            elements: [
+                { data: { id: 'age' } },
+                { data: { id: 'education' } },
+                { data: { id: 'experience' } },
+                { data: { id: 'income' } },
+                { data: { id: 'socioeconomic' } },
+                { data: { id: 'age', target: 'experience', weight: '0.9' }, classes: 'edge' },
+                { data: { id: 'age', target: 'income', weight: '0.3' }, classes: 'edge' },
+                { data: { id: 'education', target: 'income', weight: '0.6' }, classes: 'edge' },
+                { data: { id: 'experience', target: 'income', weight: '0.8' }, classes: 'edge' },
+                { data: { id: 'socioeconomic', target: 'education', weight: '0.7' }, classes: 'edge' },
+                { data: { id: 'socioeconomic', target: 'income', weight: '0.4' }, classes: 'edge' }
+            ],
+            layout: {
+                name: 'cose',
+                directed: true,
+                animate: true
+            }
+        });
+        
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+                
+                if (tabName === 'causal') {
+                    cy.layout({ name: 'cose', animate: true }).run();
+                }
+            });
+        });
+        
+        // What-If Playground
+        function updatePrediction() {
+            const age = parseInt(document.getElementById('ageSlider').value);
+            const edu = parseInt(document.getElementById('eduSlider').value);
+            const exp = parseInt(document.getElementById('expSlider').value);
+            
+            document.getElementById('ageValue').textContent = age;
+            document.getElementById('eduValue').textContent = edu;
+            document.getElementById('expValue').textContent = exp;
+            
+            // Simple linear model: income = 0.3*age + 0.5*edu + 0.2*exp - 1.5 (in thousands)
+            const prediction = (0.3 * age + 0.5 * edu + 0.2 * exp - 1.5);
+            const baseline = (0.3 * 30 + 0.5 * 12 + 0.2 * 5 - 1.5);
+            const change = ((prediction - baseline) / baseline * 100).toFixed(1);
+            
+            document.getElementById('predictionValue').textContent = '$' + (prediction * 1000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            document.getElementById('predictionChange').textContent = (change > 0 ? '+' : '') + change + '%';
+        }
+        
+        function resetPlayground() {
+            document.getElementById('ageSlider').value = 30;
+            document.getElementById('eduSlider').value = 12;
+            document.getElementById('expSlider').value = 5;
+            updatePrediction();
+        }
+        
+        // Graph controls
+        function addNode() {
+            const nodeName = document.getElementById('nodeInput').value;
+            if (nodeName) {
+                cy.add({ data: { id: nodeName } });
+                document.getElementById('nodeInput').value = '';
+                updateGraphStats();
+            }
+        }
+        
+        function addEdge() {
+            const edgeInput = document.getElementById('edgeInput').value;
+            const match = edgeInput.match(/(\w+)->(\w+):?([\d.]+)?/);
+            if (match) {
+                const source = match[1];
+                const target = match[2];
+                const weight = match[3] || '1.0';
+                cy.add({ data: { id: source + '-' + target, source, target, weight } });
+                document.getElementById('edgeInput').value = '';
+                updateGraphStats();
+            }
+        }
+        
+        function resetGraph() {
+            cy.elements().remove();
+            // Reload default graph
+            location.reload();
+        }
+        
+        function updateGraphStats() {
+            document.getElementById('nodeCount').textContent = cy.nodes().length;
+            document.getElementById('edgeCount').textContent = cy.edges().length;
+        }
+        
+        // Initialize predictions
+        updatePrediction();
+    </script>
+</body>
+</html>

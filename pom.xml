@@ -35,13 +35,6 @@
         <url>https://github.com/Thung0808/xai-core/tree/main</url>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <url>https://central.sonatype.com/api/v1/publisher/deployments</url>
-        </repository>
-    </distributionManagement>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
@@ -165,6 +158,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Central Publishing plugin for Sonatype Central Portal -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.5.0</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
         <resources>

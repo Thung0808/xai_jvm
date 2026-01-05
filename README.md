@@ -2,10 +2,23 @@
 
 **Enterprise-grade JVM-native Explainable AI library for production systems**
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.Thung0808/xai-core)](https://central.sonatype.com/artifact/io.github.Thung0808/xai-core)
-[![Java](https://img.shields.io/badge/java-21%2B-blue)](https://openjdk.org/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Build](https://img.shields.io/badge/build-passing-brightgreen)]()
+<!-- Badges Row 1: Release & Build -->
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.thung0808/xai-core?label=Maven%20Central&color=blue)](https://central.sonatype.com/artifact/io.github.thung0808/xai-core)
+[![Release](https://img.shields.io/badge/release-v1.1.0-brightgreen)](https://github.com/Thung0808/xai_jvm/releases/tag/v1.1.0)
+[![Build](https://img.shields.io/badge/build-passing-success)](https://github.com/Thung0808/xai_jvm)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+<!-- Badges Row 2: Technology Stack -->
+[![Java](https://img.shields.io/badge/Java-21+-orange?logo=openjdk)](https://openjdk.org/)
+[![Maven](https://img.shields.io/badge/Maven-3.11.0-C71A36?logo=apache-maven)](https://maven.apache.org/)
+[![SIMD](https://img.shields.io/badge/SIMD-Vector%20API-blueviolet)](https://openjdk.org/jeps/460)
+[![Virtual Threads](https://img.shields.io/badge/Virtual%20Threads-Enabled-green)](https://openjdk.org/jeps/444)
+
+<!-- Badges Row 3: Stats & Community -->
+[![GitHub Stars](https://img.shields.io/github/stars/Thung0808/xai_jvm?style=social)](https://github.com/Thung0808/xai_jvm/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/Thung0808/xai_jvm?style=social)](https://github.com/Thung0808/xai_jvm/network/members)
+[![Downloads](https://img.shields.io/badge/downloads-check%20Maven%20Central-informational)](https://central.sonatype.com/artifact/io.github.thung0808/xai-core/1.1.0)
+[![Issues](https://img.shields.io/github/issues/Thung0808/xai_jvm)](https://github.com/Thung0808/xai_jvm/issues)
 
 XAI Core is a **lightweight, zero-dependency** explainability library designed for **real-world JVM applications**. Built with Java 21, it delivers SHAP-class explanations with sub-millisecond latency using SIMD acceleration and Virtual Threads.
 
@@ -480,23 +493,65 @@ Import JSON directly as data source.
 
 MIT License - see [LICENSE](LICENSE) for details.
 
+---
+
+## 🌟 Star History & Community
+
+**Help us grow!** If you find XAI Core useful, please give it a ⭐ on GitHub!
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Thung0808/xai_jvm&type=Date)](https://star-history.com/#Thung0808/xai_jvm&Date)
+
+### Share with Your Network
+
+📢 **Spread the word:**
+- [Share on Twitter](https://twitter.com/intent/tweet?text=Check%20out%20XAI%20Core%20-%20Enterprise-grade%20Explainable%20AI%20for%20JVM!%20%F0%9F%9A%80%20Sub-millisecond%20latency%2C%20Java%2021%2C%20SIMD%20acceleration%20%F0%9F%94%A5&url=https://github.com/Thung0808/xai_jvm)
+- [Share on LinkedIn](https://www.linkedin.com/sharing/share-offsite/?url=https://github.com/Thung0808/xai_jvm)
+- [Discuss on Reddit](https://www.reddit.com/submit?url=https://github.com/Thung0808/xai_jvm&title=XAI%20Core%20-%20Enterprise%20Explainable%20AI%20for%20JVM)
+- [Share on Hacker News](https://news.ycombinator.com/submitlink?u=https://github.com/Thung0808/xai_jvm&t=XAI%20Core%20-%20Sub-millisecond%20explainability%20for%20production%20JVM%20systems)
+
+### Join the Community
+
+💬 **Get involved:**
+- 🐛 [Report bugs](https://github.com/Thung0808/xai_jvm/issues/new?labels=bug)
+- 💡 [Request features](https://github.com/Thung0808/xai_jvm/issues/new?labels=enhancement)
+- 📖 [Contribute to Wiki](https://github.com/Thung0808/xai_jvm/wiki)
+- 🤝 [Submit Pull Requests](https://github.com/Thung0808/xai_jvm/pulls)
+
+---
+
+## 📚 Documentation & Learning Resources
+
+### Quick Links
+
+- 📘 **[Wiki Home](https://github.com/Thung0808/xai_jvm/wiki)** - Comprehensive guides and tutorials
+- 🧮 **[Causal AI Guide](https://github.com/Thung0808/xai_jvm/wiki/Causal-AI)** - Pearl's do-calculus and counterfactuals
+- 🔒 **[Privacy-Preserving XAI](https://github.com/Thung0808/xai_jvm/wiki/Privacy-XAI)** - Differential privacy explained
+- 🤖 **[LLM Explainability](https://github.com/Thung0808/xai_jvm/wiki/LLM-XAI)** - Attention maps and token saliency
+- 🎯 **[API Stability](STABILITY.md)** - Production guarantees
+- 🗺️ **[Roadmap](ROADMAP.md)** - Future plans (v1.2.0-v2.0.0)
+
+---
+
 ## Citation
 
 ```bibtex
-@software{xai_core_2024,
+@software{xai_core_2026,
   title = {XAI Core: Enterprise-grade JVM-native Explainable AI},
-  author = {Your Name},
-  year = {2024},
-  url = {https://github.com/Thung0808/xai-core}
+  author = {Thung, Developer},
+  year = {2026},
+  version = {1.1.0},
+  url = {https://github.com/Thung0808/xai_jvm},
+  note = {Sub-millisecond explainability for production JVM systems}
 }
 ```
 
 ## Support
 
-- **Documentation**: [https://Thung0808.github.io/xai-core](https://Thung0808.github.io/xai-core)
-- **Issues**: [GitHub Issues](https://github.com/Thung0808/xai-core/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Thung0808/xai-core/discussions)
+- **Documentation**: [Wiki](https://github.com/Thung0808/xai_jvm/wiki)
+- **Issues**: [GitHub Issues](https://github.com/Thung0808/xai_jvm/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Thung0808/xai_jvm/discussions)
 
 ---
 
 **Built with ❤️ for the JVM ecosystem**
+
