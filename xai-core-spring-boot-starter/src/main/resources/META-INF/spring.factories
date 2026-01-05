@@ -1,0 +1,3 @@
+﻿# Spring Boot Auto-Configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.github.Thung0808.xai.spring.boot.autoconfigure.XaiAutoConfiguration

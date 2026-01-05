@@ -1,0 +1,294 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAI Core Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        [v-cloak] { display: none; }
+        .force-bar {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" v-cloak>
+        <div class="min-h-screen">
+            <!-- Header -->
+            <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
+                <div class="container mx-auto px-6 py-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold">XAI Core Dashboard</h1>
+                            <p class="text-blue-100 mt-1">Enterprise-grade JVM-native Explainable AI</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-blue-100">Explainer</div>
+                            <div class="text-lg font-semibold">{{ data.explainer }}</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="container mx-auto px-6 py-8">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6 feature-card">
+                        <div class="text-gray-500 text-sm uppercase tracking-wide">Prediction</div>
+                        <div class="text-3xl font-bold text-blue-600 mt-2">
+                            {{ (data.prediction * 100).toFixed(1) }}%
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6 feature-card">
+                        <div class="text-gray-500 text-sm uppercase tracking-wide">Trust Score</div>
+                        <div class="text-3xl font-bold text-green-600 mt-2">
+                            {{ (data.trustScore * 100).toFixed(0) }}%
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6 feature-card">
+                        <div class="text-gray-500 text-sm uppercase tracking-wide">Top Feature</div>
+                        <div class="text-xl font-bold text-gray-800 mt-2 truncate">
+                            {{ topFeature.name }}
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6 feature-card">
+                        <div class="text-gray-500 text-sm uppercase tracking-wide">Samples</div>
+                        <div class="text-3xl font-bold text-indigo-600 mt-2">
+                            {{ data.samples }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Force Plot -->
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Force Plot — Feature Attribution
+                    </h2>
+                    <p class="text-gray-600 mb-6">How features push the prediction from base value to final output</p>
+                    
+                    <!-- Force Visualization -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-600">Base Value</span>
+                            <span class="text-sm font-medium text-gray-600">Final Prediction</span>
+                        </div>
+                        <div class="relative h-16 bg-gradient-to-r from-red-200 via-white to-green-200 rounded-lg overflow-hidden shadow-inner">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                                <span class="bg-white px-3 py-1 rounded-full text-sm font-bold shadow">
+                                    {{ data.baseValue.toFixed(3) }}
+                                </span>
+                            </div>
+                            <div class="absolute inset-y-0 flex items-center transition-all duration-500" 
+                                 :style="{ left: (data.prediction * 100) + '%' }">
+                                <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                                    {{ data.prediction.toFixed(3) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature Contributions -->
+                    <div class="space-y-3">
+                        <div v-for="(feature, index) in sortedFeatures" :key="index" 
+                             class="force-bar">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">{{ feature.name }}</span>
+                                <span class="text-sm font-bold" 
+                                      :class="feature.attribution > 0 ? 'text-green-600' : 'text-red-600'">
+                                    {{ feature.attribution > 0 ? '+' : '' }}{{ feature.attribution.toFixed(4) }}
+                                </span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="flex-1 h-8 bg-gray-100 rounded-lg overflow-hidden">
+                                    <div class="h-full transition-all duration-300" 
+                                         :class="feature.attribution > 0 ? 'bg-green-500' : 'bg-red-500'"
+                                         :style="{ width: Math.abs(feature.attribution / maxAbsAttribution * 100) + '%' }">
+                                    </div>
+                                </div>
+                                <span class="ml-3 text-xs text-gray-500 w-16 text-right">
+                                    {{ (Math.abs(feature.attribution) / totalAbsAttribution * 100).toFixed(1) }}%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Details Table -->
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Feature Details
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feature</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attribution</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="(feature, index) in sortedFeatures" :key="index" 
+                                    class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        {{ feature.name }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        {{ feature.value.toFixed(3) }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold" 
+                                        :class="feature.attribution > 0 ? 'text-green-600' : 'text-red-600'">
+                                        {{ feature.attribution > 0 ? '+' : '' }}{{ feature.attribution.toFixed(4) }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        {{ (feature.confidence * 100).toFixed(1) }}%
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" 
+                                              :class="getImpactBadgeClass(feature.attribution)">
+                                            {{ getImpactLabel(feature.attribution) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Counterfactual Section (if available) -->
+                <div v-if="data.counterfactual" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        Counterfactual — What-If Analysis
+                    </h2>
+                    <p class="text-gray-600 mb-4">What changes would lead to a different outcome?</p>
+                    <div class="bg-purple-50 border-l-4 border-purple-600 p-4 rounded">
+                        <p class="text-sm text-gray-700">
+                            <strong>Target Prediction:</strong> {{ (data.counterfactual.target * 100).toFixed(1) }}%
+                        </p>
+                        <p class="text-sm text-gray-700 mt-2">
+                            <strong>Changes needed:</strong> {{ data.counterfactual.changes.length }} features
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Metadata Footer -->
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 text-white">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                            <div class="text-gray-400 uppercase tracking-wide text-xs">Explainer</div>
+                            <div class="font-semibold mt-1">{{ data.explainer }}</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-400 uppercase tracking-wide text-xs">Timestamp</div>
+                            <div class="font-semibold mt-1">{{ new Date(data.timestamp).toLocaleString() }}</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-400 uppercase tracking-wide text-xs">Library Version</div>
+                            <div class="font-semibold mt-1">{{ data.libraryVersion }}</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-400 uppercase tracking-wide text-xs">Schema Version</div>
+                            <div class="font-semibold mt-1">{{ data.schemaVersion }}</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-white border-t mt-12 py-6">
+                <div class="container mx-auto px-6 text-center text-gray-600 text-sm">
+                    <p>Generated by <strong>XAI Core</strong> — Enterprise-grade JVM-native Explainable AI</p>
+                    <p class="mt-1">
+                        <a href="https://github.com/Thung0808/xai-core" class="text-blue-600 hover:underline">GitHub</a> · 
+                        <a href="https://xai-core.readthedocs.io" class="text-blue-600 hover:underline ml-2">Documentation</a>
+                    </p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    data: window.XAI_DATA || {
+                        schemaVersion: "1.0",
+                        explainer: "PermutationExplainer",
+                        prediction: 0.87,
+                        baseValue: 0.5,
+                        trustScore: 0.92,
+                        samples: 1000,
+                        timestamp: Date.now(),
+                        libraryVersion: "0.7.0",
+                        features: [
+                            { name: "age", value: 45.0, attribution: 0.25, confidence: 0.95 },
+                            { name: "income", value: 75000.0, attribution: 0.18, confidence: 0.92 },
+                            { name: "credit_score", value: 720.0, attribution: -0.08, confidence: 0.88 },
+                            { name: "debt_ratio", value: 0.35, attribution: -0.03, confidence: 0.85 },
+                            { name: "employment_years", value: 12.0, attribution: 0.05, confidence: 0.90 }
+                        ],
+                        counterfactual: null
+                    }
+                };
+            },
+            computed: {
+                sortedFeatures() {
+                    return [...this.data.features].sort((a, b) => Math.abs(b.attribution) - Math.abs(a.attribution));
+                },
+                topFeature() {
+                    return this.sortedFeatures[0] || { name: 'N/A', attribution: 0 };
+                },
+                maxAbsAttribution() {
+                    return Math.max(...this.data.features.map(f => Math.abs(f.attribution)));
+                },
+                totalAbsAttribution() {
+                    return this.data.features.reduce((sum, f) => sum + Math.abs(f.attribution), 0);
+                }
+            },
+            methods: {
+                getImpactBadgeClass(attribution) {
+                    const abs = Math.abs(attribution);
+                    if (abs > 0.1) return 'bg-red-100 text-red-800';
+                    if (abs > 0.05) return 'bg-yellow-100 text-yellow-800';
+                    return 'bg-green-100 text-green-800';
+                },
+                getImpactLabel(attribution) {
+                    const abs = Math.abs(attribution);
+                    if (abs > 0.1) return 'High';
+                    if (abs > 0.05) return 'Medium';
+                    return 'Low';
+                }
+            },
+            mounted() {
+                console.log('XAI Core Dashboard loaded');
+                console.log('Data:', this.data);
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

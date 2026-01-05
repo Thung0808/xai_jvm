@@ -1,0 +1,54 @@
+﻿# XAI Core Spring Boot Auto-Configuration Example
+# Copy this to application.yml in your Spring Boot project
+
+spring:
+  application:
+    name: xai-example-service
+  
+server:
+  port: 8080
+
+# XAI Core Configuration
+xai:
+  enabled: true
+  
+  # Default explainer type: permutation, tree, linear, causal
+  default-explainer: permutation
+  
+  # Default number of samples for permutation-based methods
+  default-samples: 100
+  
+  # Metrics Configuration
+  metrics:
+    enabled: true
+    percentiles: [0.5, 0.95, 0.99]
+  
+  # @Explainable Annotation Configuration
+  annotation:
+    enabled: true
+    log-to-console: true
+    log-to-database: false
+
+# Spring Boot Actuator for Prometheus metrics export
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    io.github.Thung0808.xai: DEBUG
+    io.micrometer: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
