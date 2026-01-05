@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.examples;
+package io.github.Thung0808.xai.examples;
 
 /**
  * Quick start guide for XAI Core.

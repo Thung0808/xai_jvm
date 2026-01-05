@@ -1,4 +1,4 @@
-﻿package ai.xai.core;
+package ai.xai.core;
 
 /**
  * Generic interface for predictable models.

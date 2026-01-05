@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.internal;
+package io.github.Thung0808.xai.internal;
 
 import java.lang.annotation.*;
 

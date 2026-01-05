@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Security features for XAI explanations.
  * 
  * <p>Defends against adversarial attacks on explanations:

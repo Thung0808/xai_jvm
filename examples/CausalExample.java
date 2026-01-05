@@ -1,4 +1,4 @@
-﻿package examples;
+package examples;
 
 import io.github.Thung0808.xai.api.*;
 import io.github.Thung0808.xai.causal.*;

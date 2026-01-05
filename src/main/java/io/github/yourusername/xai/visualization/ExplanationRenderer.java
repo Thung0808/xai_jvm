@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.visualization;
+package io.github.Thung0808.xai.visualization;
 
 import io.github.Thung0808.xai.api.Explanation;
 

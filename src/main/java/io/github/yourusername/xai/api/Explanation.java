@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.api;
+package io.github.Thung0808.xai.api;
 
 import java.util.ArrayList;
 import java.util.Collections;

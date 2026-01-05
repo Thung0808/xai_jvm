@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.api;
+package io.github.Thung0808.xai.api;
 
 /**
  * Represents the attribution (importance) of a single feature in a prediction.

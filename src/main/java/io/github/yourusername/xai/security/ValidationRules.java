@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.security;
+package io.github.Thung0808.xai.security;
 
 import io.github.Thung0808.xai.api.*;
 

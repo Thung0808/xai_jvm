@@ -1,4 +1,4 @@
-﻿package ai.xai.adapter;
+package ai.xai.adapter;
 
 import ai.xai.core.Predictable;
 import org.junit.jupiter.api.Test;

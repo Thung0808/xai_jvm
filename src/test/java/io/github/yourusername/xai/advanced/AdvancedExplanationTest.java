@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.advanced;
+package io.github.Thung0808.xai.advanced;
 
 import io.github.Thung0808.xai.api.PredictiveModel;
 import org.junit.jupiter.api.BeforeEach;

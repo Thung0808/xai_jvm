@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.fairness;
+package io.github.Thung0808.xai.fairness;
 
 import io.github.Thung0808.xai.api.Stable;
 import io.github.Thung0808.xai.api.*;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Real-world integration examples for XAI Core.
  * 
  * <p><b>DOCUMENTATION PACKAGE - Examples for illustration purposes</b></p>

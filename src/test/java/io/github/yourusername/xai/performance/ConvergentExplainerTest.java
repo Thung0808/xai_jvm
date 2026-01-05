@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.performance;
+package io.github.Thung0808.xai.performance;
 
 import io.github.Thung0808.xai.api.*;
 import org.junit.jupiter.api.Test;

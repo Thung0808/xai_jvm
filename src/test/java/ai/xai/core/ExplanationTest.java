@@ -1,4 +1,4 @@
-﻿package ai.xai.core;
+package ai.xai.core;
 
 import org.junit.jupiter.api.Test;
 

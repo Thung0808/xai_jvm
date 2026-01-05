@@ -1,4 +1,4 @@
-﻿package ai.xai;
+package ai.xai;
 
 public class App {
     public static void main(String[] args) {

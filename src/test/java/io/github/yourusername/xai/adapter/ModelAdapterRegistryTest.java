@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.adapter;
+package io.github.Thung0808.xai.adapter;
 
 import io.github.Thung0808.xai.api.PredictiveModel;
 import org.junit.jupiter.api.Test;

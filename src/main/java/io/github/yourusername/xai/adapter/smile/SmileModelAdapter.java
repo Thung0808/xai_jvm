@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.adapter.smile;
+package io.github.Thung0808.xai.adapter.smile;
 
 import io.github.Thung0808.xai.adapter.ModelAdapter;
 import io.github.Thung0808.xai.api.PredictiveModel;

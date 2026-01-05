@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.global;
+package io.github.Thung0808.xai.global;
 
 import io.github.Thung0808.xai.api.PredictiveModel;
 import io.github.Thung0808.xai.experimental.Incubating;

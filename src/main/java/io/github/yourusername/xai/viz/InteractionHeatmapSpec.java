@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.viz;
+package io.github.Thung0808.xai.viz;
 
 import io.github.Thung0808.xai.advanced.InteractionPlot;
 import io.github.Thung0808.xai.api.Stable;

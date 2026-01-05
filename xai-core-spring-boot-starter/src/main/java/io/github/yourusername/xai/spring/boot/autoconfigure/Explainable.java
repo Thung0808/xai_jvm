@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.spring.boot.autoconfigure;
+package io.github.Thung0808.xai.spring.boot.autoconfigure;
 
 import java.lang.annotation.*;
 

@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.api.context;
+package io.github.Thung0808.xai.api.context;
 
 /**
  * Represents a condition on a feature value.

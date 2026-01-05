@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Compliance and audit reporting for XAI explanations.
  * 
  * <p>Provides GDPR and EU AI Act compliance features:

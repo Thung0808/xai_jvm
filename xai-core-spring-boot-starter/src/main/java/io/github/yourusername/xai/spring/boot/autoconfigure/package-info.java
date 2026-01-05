@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Spring Boot auto-configuration for XAI Core.
  * 
  * <p><strong>Quick Start (30 seconds):</strong></p>

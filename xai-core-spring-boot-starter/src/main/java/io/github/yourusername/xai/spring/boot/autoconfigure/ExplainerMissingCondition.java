@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.spring.boot.autoconfigure;
+package io.github.Thung0808.xai.spring.boot.autoconfigure;
 
 import io.github.Thung0808.xai.api.Explainer;
 import org.springframework.context.annotation.Condition;

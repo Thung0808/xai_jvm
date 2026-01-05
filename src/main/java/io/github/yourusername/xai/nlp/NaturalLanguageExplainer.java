@@ -1,4 +1,4 @@
-﻿package io.github.Thung0808.xai.nlp;
+package io.github.Thung0808.xai.nlp;
 
 import io.github.Thung0808.xai.api.Explanation;
 import io.github.Thung0808.xai.api.FeatureAttribution;
